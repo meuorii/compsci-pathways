@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import googleLogo from "../assets/google.png";
 import microsoftLogo from "../assets/microsoft.png";
 import amazonLogo from "../assets/amazon.png";
@@ -19,11 +20,15 @@ const IndustryPartnerships = () => {
   const [radius, setRadius] = useState(170);
   const [angleOffset, setAngleOffset] = useState(0);
 
+  // Responsive radius
   useEffect(() => {
     const setR = () => {
       if (!canvasRef.current) return;
       const rect = canvasRef.current.getBoundingClientRect();
-      const r = Math.max(120, Math.min(200, Math.floor(Math.min(rect.width, rect.height) * 0.32)));
+      const r = Math.max(
+        120,
+        Math.min(200, Math.floor(Math.min(rect.width, rect.height) * 0.32))
+      );
       setRadius(r);
     };
     setR();
@@ -33,12 +38,16 @@ const IndustryPartnerships = () => {
 
   // Animate rotation
   useEffect(() => {
-    const interval = setInterval(() => {
-      setAngleOffset((prev) => prev + 0.01); // slow rotation
-    }, 50);
-    return () => clearInterval(interval);
+    let frameId;
+    const rotate = () => {
+      setAngleOffset((prev) => prev + 0.002);
+      frameId = requestAnimationFrame(rotate);
+    };
+    frameId = requestAnimationFrame(rotate);
+    return () => cancelAnimationFrame(frameId);
   }, []);
 
+  // Orbit positions
   const orbit = useMemo(() => {
     const count = partners.length;
     return partners.map((p, i) => {
@@ -55,39 +64,53 @@ const IndustryPartnerships = () => {
       className="py-24 px-6 text-white relative overflow-hidden"
       style={{ backgroundColor: "#232331" }}
     >
-      {/* Decorative background glows */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-[#3B82F6]/20 rounded-full blur-3xl -z-10"></div>
-      <div className="absolute bottom-0 right-0 w-[28rem] h-[28rem] bg-[#2563EB]/20 rounded-full blur-3xl -z-10"></div>
+      {/* Background glow */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-[#3B82F6]/20 blur-3xl rounded-full -z-10"></div>
+      <div className="absolute bottom-0 right-0 w-[28rem] h-[28rem] bg-[#2563EB]/20 blur-3xl rounded-full -z-10"></div>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-        {/* Left: Orbit Visualization */}
-        <div ref={canvasRef} className="relative h-[500px] flex items-center justify-center">
+        {/* Left Orbit */}
+        <div
+          ref={canvasRef}
+          className="relative h-[500px] flex items-center justify-center"
+        >
           {/* Orbit Circle */}
           <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none">
-            <circle cx="50%" cy="50%" r={radius} stroke="#3B82F6" strokeWidth="1" fill="none" />
+            <circle
+              cx="50%"
+              cy="50%"
+              r={radius}
+              stroke="#3B82F6"
+              strokeWidth="1"
+              strokeDasharray="4 6"
+              fill="none"
+            />
           </svg>
 
           {/* Center Hub */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
             <div className="w-32 h-32 flex items-center justify-center rounded-full bg-[#1F1F2E]/80 backdrop-blur-md shadow-lg border-2 border-[#3B82F6] relative">
-              {/* Glow halo */}
               <div className="absolute inset-0 rounded-full bg-[#3B82F6]/30 blur-2xl animate-pulse"></div>
-              <img src={microsoftLogo} alt="Microsoft" className="h-14 object-contain relative z-10" />
+              <img
+                src={microsoftLogo}
+                alt="Microsoft"
+                className="h-14 object-contain relative z-10"
+              />
             </div>
             <p className="mt-2 text-gray-300 text-sm">Microsoft</p>
           </div>
 
-          {/* Connecting lines */}
+          {/* Connecting Lines */}
           <svg className="absolute inset-0 w-full h-full opacity-40 pointer-events-none">
             {orbit.map((n, idx) => (
               <line
-                key={`line-${idx}`}
+                key={idx}
                 x1="50%"
                 y1="50%"
-                x2={`calc(50% + ${n.x}px)`}
-                y2={`calc(50% + ${n.y}px)`}
+                x2={`${50 + (n.x / radius) * 50}%`}
+                y2={`${50 + (n.y / radius) * 50}%`}
                 stroke="#60A5FA"
-                strokeWidth="1"
+                strokeWidth="0.7"
               />
             ))}
           </svg>
@@ -104,7 +127,6 @@ const IndustryPartnerships = () => {
               }}
             >
               <div className="w-20 h-20 flex items-center justify-center rounded-full bg-[#1F1F2E] shadow-lg border-2 border-transparent group-hover:border-[#3B82F6] transition-all duration-500 relative">
-                {/* Glow halo */}
                 <div className="absolute inset-0 rounded-full bg-[#3B82F6]/30 blur-xl opacity-0 group-hover:opacity-100 transition"></div>
                 <img
                   src={n.logo}
@@ -119,8 +141,14 @@ const IndustryPartnerships = () => {
           ))}
         </div>
 
-        {/* Right: Header and Description */}
-        <div className="text-left md:pl-8 relative">
+        {/* Right Text (Header + Subheader only with animation) */}
+        <motion.div
+          className="text-left md:pl-8 relative"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          viewport={{ once: true, amount: 0.3 }}
+        >
           <h2 className="text-3xl md:text-5xl font-extrabold leading-tight">
             Our{" "}
             <span className="bg-gradient-to-r from-[#3B82F6] to-[#2563EB] bg-clip-text text-transparent">
@@ -131,11 +159,13 @@ const IndustryPartnerships = () => {
             Collaborating with global leaders, we connect students with{" "}
             <span className="text-[#3B82F6] font-semibold">internships</span>,{" "}
             <span className="text-[#3B82F6] font-semibold">mentorships</span>, and{" "}
-            <span className="text-[#3B82F6] font-semibold">career opportunities</span> across the
-            tech industry. Our partnerships prepare graduates for impactful roles in world-class
-            companies.
+            <span className="text-[#3B82F6] font-semibold">
+              career opportunities
+            </span>{" "}
+            across the tech industry. Our partnerships prepare graduates for impactful
+            roles in world-class companies.
           </p>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

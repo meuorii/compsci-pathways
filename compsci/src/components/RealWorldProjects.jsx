@@ -1,4 +1,6 @@
 import React from "react";
+import { motion } from "framer-motion";
+
 import project1 from "../assets/project1.jpg";
 import project2 from "../assets/project2.jpg";
 import project3 from "../assets/project3.jpg";
@@ -16,6 +18,24 @@ const RealWorldProjects = () => {
     { title: "Cloud-Based LMS", desc: "Learning system for online courses and collaboration.", img: project6 },
   ];
 
+  // Animation variants
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: { staggerChildren: 0.2, delayChildren: 0.2 },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.7, ease: "easeOut" },
+    },
+  };
+
   return (
     <section
       id="projects"
@@ -27,7 +47,13 @@ const RealWorldProjects = () => {
       <div className="absolute bottom-0 right-0 w-[30rem] h-[30rem] bg-[#2563EB]/20 rounded-full blur-3xl -z-10"></div>
 
       {/* Header */}
-      <div className="max-w-6xl mx-auto text-center mb-20">
+      <motion.div
+        className="max-w-6xl mx-auto text-center mb-20"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        viewport={{ once: true }}
+      >
         <h2 className="text-3xl md:text-5xl font-extrabold">
           Real-World{" "}
           <span className="bg-gradient-to-r from-[#3B82F6] to-[#2563EB] bg-clip-text text-transparent">
@@ -38,13 +64,20 @@ const RealWorldProjects = () => {
           Build innovative solutions with hands-on projects designed to reflect{" "}
           <span className="text-[#60A5FA] font-medium">real industry challenges</span>.
         </p>
-      </div>
+      </motion.div>
 
       {/* Project Grid */}
-      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-14">
+      <motion.div
+        className="max-w-6xl mx-auto grid md:grid-cols-2 gap-14"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+      >
         {projects.map((p, i) => (
-          <div
+          <motion.div
             key={i}
+            variants={cardVariants}
             className={`relative rounded-2xl overflow-hidden shadow-lg group transition-all duration-700 hover:-translate-y-3 hover:shadow-[0_0_25px_#3B82F6]/40 ${
               i % 2 === 1 ? "md:mt-12" : ""
             }`}
@@ -69,9 +102,7 @@ const RealWorldProjects = () => {
               <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-[#60A5FA] transition">
                 {p.title}
               </h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                {p.desc}
-              </p>
+              <p className="text-gray-400 text-sm leading-relaxed">{p.desc}</p>
               <button className="mt-6 px-6 py-2.5 bg-[#3B82F6] hover:bg-[#2563EB] rounded-lg text-sm font-semibold transition transform hover:scale-105 shadow-md hover:shadow-[#3B82F6]/30">
                 Learn More
               </button>
@@ -79,9 +110,9 @@ const RealWorldProjects = () => {
 
             {/* Glow border */}
             <div className="absolute inset-0 rounded-2xl border border-transparent group-hover:border-[#3B82F6] transition-all duration-500"></div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </section>
   );
 };

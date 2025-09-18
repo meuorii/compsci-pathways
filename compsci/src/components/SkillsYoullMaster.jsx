@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import {
   FaCode,
   FaDatabase,
@@ -42,6 +43,24 @@ const SkillsYoullMaster = () => {
     },
   ];
 
+  // Variants for container and items
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: { staggerChildren: 0.2, delayChildren: 0.2 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 40, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
+  };
+
   return (
     <section
       id="skills"
@@ -53,7 +72,13 @@ const SkillsYoullMaster = () => {
       <div className="absolute bottom-0 right-0 w-[28rem] h-[28rem] bg-[#2563EB]/20 blur-3xl rounded-full -z-10"></div>
 
       {/* Header */}
-      <div className="max-w-6xl mx-auto text-center mb-20">
+      <motion.div
+        className="max-w-6xl mx-auto text-center mb-20"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        viewport={{ once: true }}
+      >
         <h2 className="text-3xl md:text-5xl font-extrabold">
           Skills You’ll{" "}
           <span className="bg-gradient-to-r from-[#3B82F6] to-[#2563EB] bg-clip-text text-transparent">
@@ -65,19 +90,28 @@ const SkillsYoullMaster = () => {
           coding to AI, discover the tools and knowledge you’ll gain throughout
           your Computer Science journey.
         </p>
-      </div>
+      </motion.div>
 
       {/* Roadmap Grid */}
-      <div className="max-w-6xl mx-auto relative">
+      <motion.div
+        className="max-w-6xl mx-auto relative"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+      >
         {/* Connector line (glowing) */}
         <div className="hidden md:block absolute top-1/2 left-0 w-full h-[3px] bg-gradient-to-r from-[#2C2C2B] via-[#3B82F6]/30 to-[#2C2C2B]"></div>
 
         <div className="grid grid-cols-1 md:grid-cols-6 gap-10 relative z-10">
           {skills.map((skill, index) => (
-            <div
+            <motion.div
               key={index}
+              variants={itemVariants}
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
               className="relative flex flex-col items-center text-center p-6 rounded-2xl shadow-lg bg-[#1F1F2E]/90 backdrop-blur-md 
-              transition-all duration-500 hover:-translate-y-3 group overflow-hidden"
+              transition-all duration-500 group overflow-hidden"
             >
               {/* Glow border */}
               <div className="absolute inset-0 rounded-2xl border border-transparent group-hover:border-[#3B82F6] transition-all duration-500"></div>
@@ -99,10 +133,10 @@ const SkillsYoullMaster = () => {
               <p className="text-gray-400 text-sm leading-relaxed">
                 {skill.desc}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };
